@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Авторизация</title>
+    <style>
+        body {
+            background: #666;
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 40rem;
+            margin: 0 auto;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .auth-box {
+            background: #232323;
+            border-radius: 24px;
+            padding: 36px 30px 30px 30px;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.2);
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+        .input-row {
+            display: flex;
+            gap: 14px;
+        }
+        .auth-input {
+            background: #333;
+            border: none;
+            border-radius: 16px;
+            padding: 16px;
+            color: #ccc;
+            font-size: 18px;
+            outline: none;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .auth-input::placeholder {
+            color: #8b8b8b;
+        }
+        .name-input {
+            flex: 2;
+        }
+        .group-input {
+            flex: 1;
+            max-width: 150px;
+        }
+        .password-row {
+            display: flex;
+            gap: 14px;
+        }
+        .password-input {
+            flex: 2;
+        }
+        .auth-btn {
+            background: #21b47d;
+            color: #fff;
+            border: none;
+            border-radius: 24px;
+            padding: 14px 0;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 6px;
+        }
+        .auth-btn:hover {
+            background: #179865;
+        }
+        .register-link {
+            display: block;
+            text-align: center;
+            margin-top: 10px;
+            color: #fff;
+            font-size: 15px;
+            text-decoration: none;
+            opacity: 0.85;
+        }
+        .register-link:hover {
+            text-decoration: underline;
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form class="auth-box">
+            <div class="input-row">
+                <input type="text" name="fio" class="auth-input name-input" placeholder="Фамилия Имя" required>
+                <input type="text" name="group" class="auth-input group-input" placeholder="Группа" required>
+            </div>
+            <div class="input-row">
+                <input type="password" name="pswd" class="auth-input password-input" placeholder="Пароль" required>
+            </div>
+            <button type="submit" class="auth-btn">Авторизация</button>
+        </form>
+        <a href="/register" class="register-link">Нет аккаунта? Регистрация</a>
+    </div>
+    <script src="../static/sign_in.js"></script>
+</body>
+</html>
