@@ -37,6 +37,22 @@
             font-weight: normal;
             letter-spacing: 1px;
         }
+        .task-arrows {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .task-arrows a {
+            font-size: 2.2em;
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .task-arrows a:hover {
+            color: #2ecc71;
+        }
+
         .main {
             flex: 1;
             display: flex;
@@ -50,11 +66,7 @@
         }
 
         .table{
-            height: 70%;
-        }
-
-        .answer{
-            height: 15%;
+            height: 80%;
         }
 
         .block {
@@ -98,7 +110,7 @@
             display: flex;
             justify-content: flex-end;
         }
-        .btn {
+        .buttonSend, .buttonTry {
             background: #2ecc71;
             color: #fff;
             border: none;
@@ -132,35 +144,36 @@
     <div class="container">
         <div class="sidebar">
             <h2>Задание #1</h2>
+            <div class="task-arrows">
+                <a href="#" title="Предыдущее задание", id="previous_task">&#8592;</a>
+                <a href="#" title="Следующее задание", id="next_task">&#8594;</a>
+            </div>
             <div>Текст задания</div>
+            <text class="task">проверка</text>
+
         </div>
         <div class="main">
-            <div class="sql">
-                <div class="block" >
+            <form action="#" class="sql">
+                <div class="block">
                     <label for="sql">SQL-запрос</label>
-                    <textarea id="sql" placeholder=""></textarea>
+                    <textarea name="sql" placeholder=""></textarea>
                     <div class="buttons">
-                        <button class="btn">Выполнить</button>
+                        <button class="buttonTry">Выполнить</button>
                     </div>
                 </div>
-            </div>
+            </form>
 
-            <div class="table">
+            <form action="#" class="table">
                 <div class="block">
                     <label>Таблица вывода SQL</label>
                     <div class="output"></div>
-                </div>
-            </div>
-
-            <div class="answer">
-                <div class="block">
-                    <input type="text" placeholder="Введите ответ">
                     <div class="buttons">
-                        <button class="btn">Отправить</button>
+                        <button class="buttonSend">Отправить</button>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
+    <script src="../static/task.js"></script>
 </body>
 </html>
