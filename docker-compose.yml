@@ -1,6 +1,6 @@
 services:
   web:
-    image: python:3.9-slim
+    image: python:3.11-slim
     container_name: flask_app
     command: bash -c "apt-get update && apt-get install -y libfbclient2 && pip install -r requirements.txt && python main.py"
     volumes:
