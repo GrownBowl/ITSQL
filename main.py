@@ -36,37 +36,78 @@ def index():
 @app.route('/go_query', methods=['GET', 'POST'])
 def go_query():
     req = request.json
-    sql_query = req['sql_query']
+    sql_query = req['request']
 
-    cur = stud_conn.cursor()
-    result = cur.execute(sql_query).fetchall()
+    try:
+        cur = stud_conn.cursor()
+        result = cur.execute(sql_query).fetchall()
+        print(f"Студент с id: {session['student_id']} использовал такой запрос: {sql_query}")
 
-    # дальше передать json с ответом
+        return result
+
+    except fdb.fbcore.DatabaseError as err:
+        sql_code = err.args[1]
+
+        if sql_code == -206:
+            return "Ошибка: Неизвестный столбец"
+
+        elif sql_code == -104:
+            return "Ошибка синтаксиса SQL."
+
+        elif sql_code == -204:
+            return "Ошибка: неизвестная таблица"
+
+        else:
+            print(err)
+            return "Неизвестная ошибка"
 
 
 @app.route('/check_answer', methods=['GET', 'POST'])
 def check_answer():
     req = request.json
-    sql_query = req['sql_query']
-    number = int(req['number'])
 
-    adm_cur = adm_stud_conn.cursor()
-    correct_answer = adm_cur.execute("SELECT CORRECTANSWER FROM TASKS WHERE TASKID = ?", (number,)).fetchone()[0]
+    sql_query = req['request']
+    number = int(req['number']) + 1
+    print(f"Студент с id: {session['student_id']} ответил на вопрос номер: {number} таким запросом: {sql_query}")
 
-    stud_cur = stud_conn.cursor()
-    stud_answer = stud_cur.execute(sql_query).fetchone()[0]
+    try:
+        adm_cur = adm_stud_conn.cursor()
+        correct_answer = adm_cur.execute("SELECT CORRECTANSWER FROM TASKS WHERE TASKID = ?", (number,)).fetchone()[0]
 
-    if str(correct_answer) == str(stud_answer):
-        answer_is_correct = True
-    else:
-        answer_is_correct = False
+        stud_cur = stud_conn.cursor()
+        stud_answer = stud_cur.execute(sql_query).fetchone()[0]
 
-    adm_cur.execute(
-        "INSERT INTO STUDENTANSWERS (studentid, studentanswer, iscorrect, answerdatetime, ANSWERNUMBER) VALUES (?, ?, ?, ?, ?)",
-        (14, stud_answer, answer_is_correct, datetime.now(), number))
-    adm_stud_conn.commit()
+        if str(correct_answer) == str(stud_answer):
+            answer_is_correct = True
+        else:
+            answer_is_correct = False
 
-    return jsonify({})
+        answer_already = adm_cur.execute("select * from STUDENTANSWERS where STUDENTID = ? and ANSWERNUMBER = ?",
+                                         (session["student_id"], number)).fetchall()
+
+        print(answer_already)
+        if answer_already:
+            adm_cur.execute("delete from STUDENTANSWERS where STUDENTID = ? and ANSWERNUMBER = ?", (session["student_id"], number))
+
+        adm_cur.execute(
+            "INSERT INTO STUDENTANSWERS (studentid, studentanswer, iscorrect, answerdatetime, ANSWERNUMBER) VALUES (?, ?, ?, ?, ?)",
+            (session["student_id"], stud_answer, answer_is_correct, datetime.now(), number))
+        adm_stud_conn.commit()
+
+        return jsonify({})
+
+    except fdb.fbcore.DatabaseError as err:
+        sql_code = err.args[1]
+
+        if sql_code == -206:
+            return "Ошибка: Неизвестный столбец"
+
+        elif sql_code == -104:
+            return "Ошибка синтаксиса SQL."
+
+        else:
+            print(err)
+            return "Неизвестная ошибка"
 
 
 @app.route('/get_tasks', methods=['GET'])
@@ -81,16 +122,14 @@ def get_tasks():
             "text": task[1]
         })
 
-    response = {"tasks": task_list}
-
-    return jsonify(response)
+    return jsonify(task_list)
 
 
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
         req = request.json
-        name, surname = req['userName'].split()
+        surname, name = req['userName'].split()
         group = req['group']
         user_password = req['password']
 
@@ -110,7 +149,7 @@ def register():
 def sign_in():
     if request.method == 'POST':
         req = request.json
-        name_from_form, surname_from_form = req['userName'].split()
+        surname_from_form, name_from_form = req['userName'].split()
         group_from_form = req['group']
         password_from_form = req['password']
 
@@ -167,23 +206,37 @@ def get_result():
     return jsonify({"result": count_correct_answer})
 
 
-# @app.route('/get_result_table')
-# def get_result_table():
-#     adm_cur = adm_stud_conn.cursor()
-#     results = adm_cur.execute("select STUDENTID, ISCORRECT, ANSWERNUMBER from STUDENTANSWERS").fetchall()
-#
-#     auth_cur = auth_conn.cursor()
-#     all_users = auth_cur.execute("select ID, LASTNAME, FIRSTNAME, GROUPNAME from USERS").fetchall()
-#
-#     users_id = {}
-#     for user in all_users:
-#         users_id[str(user[0])] = f"{user[1]} {user[2]} {user[3]}"
-#
-#     answers = []
-#     for res in results:
-#         print(res)
-#
-#     return "Нет ошибкам!"
+@app.route('/get_result_table')
+def get_result_table():
+    adm_cur = adm_stud_conn.cursor()
+    result = adm_cur.execute("select STUDENTID, ISCORRECT, ANSWERNUMBER from STUDENTANSWERS").fetchall()
+
+    auth_cur = auth_conn.cursor()
+    all_users = auth_cur.execute("select ID, LASTNAME, FIRSTNAME, GROUPNAME from USERS").fetchall()
+
+    answers = {}
+    users_id = {}
+    for user in all_users:
+        id = str(user[0])
+        lastname = user[1]
+        firstname = user[2]
+        groupname = user[3]
+
+        users_id[id] = f"{lastname} {firstname} {groupname}"
+        answers[id] = 0
+
+    for res in result:
+        id = str(res[0])
+        is_correct_answer = res[1]
+
+        if is_correct_answer:
+            answers[id] += 1
+
+    results = []
+    for id, res in answers.items():
+        results.append(f"{users_id[id]} правильных ответов: {res}")
+
+    return results
 
 
 @app.route('/logout')
