@@ -2,12 +2,17 @@ services:
   web:
     image: python:3.9-slim
     container_name: flask_app
-    command: bash -c "pip install -r requirements.txt && python app.py"
+    command: bash -c "apt-get update && apt-get install -y libfbclient2 && pip install -r requirements.txt && python main.py"
     volumes:
       - .:/app
+      - ./static:/app/static
+      - ./templates:/app
       - ./requirements.txt:/app/requirements.txt
-      - ./app.py:/app/app.py
+      - ./main.py:/app/main.py
+      - firebird_client:/app/firebird
     working_dir: /app
+    environment:
+      - FIREBIRD_HOME=/app/firebird
     ports:
       - "5000:5000"
     depends_on:
@@ -16,11 +21,25 @@ services:
   nginx:
     image: nginx:latest
     container_name: nginx
+    command: bash -c "chmod 777 /app/static/. && nginx -g 'daemon off;'"
     ports:
       - "80:80"
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf
-      - static_files:/var/www/html
+      - .:/app
+
+  firebird:
+    image: firebirdsql/firebird
+    restart: always
+    environment:
+      - FIREBIRD_ROOT_PASSWORD=masterkey
+      - FIREBIRD_USER=SYSDBA
+      - FIREBIRD_PASSWORD=masterkey
+      - FIREBIRD_DATABASE=mirror.fdb
+      - FIREBIRD_DATABASE_DEFAULT_CHARSET=UTF8
+    volumes:
+      - ./data:/var/lib/firebird/data
+
 
 #  git:
 #    image: alpine:latest
@@ -32,3 +51,4 @@ services:
 
 volumes:
   static_files:
+  firebird_client:
