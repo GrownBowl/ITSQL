@@ -32,10 +32,28 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             const data = await response.json();
+            const tableEl = formEl.querySelector('table');
 
             if (data.error) {
                 throw new Error ('error' + data.error);
             } else {
+                const html = `<table class = check_table> 
+                <tbody>
+                `;
+                for (const values of data){
+                    html += `<tr>`
+                    for (const value of values){
+                        html += `
+                            <td>${ value }</td>
+                        `
+                    }
+                    html += `</tr>`
+                }
+                html += `
+                </tbody>
+                </table>
+                `;
+                tableEl.innerHTML = html;
                 console.log(data);
             }
 
@@ -105,7 +123,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     function showTask(tasks) {
         const textTask = formEl.querySelector('text=["task"]');
         let currTask = sessionStorage.getItem("currentTask");
-        textTask.value(tasks.text[currTask]);
+        textTask.innerHTML = tasks.text[currTask];
         console.log(tasks.text[currTask]);
     }
 
@@ -120,4 +138,16 @@ document.addEventListener('DOMContentLoaded', async () => {
             showTask(tasks);
         }
     }
+
+    /*
+    function toHTML (data) {
+        const fetchData = [];
+        if (data.hasOwnProperty('text')){
+            for(const json in data) {
+                fetchData.push(json);
+            }
+        }
+        if (data.hasOwnProperty(''))
+    }
+    */
 });
