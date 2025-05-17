@@ -4,19 +4,14 @@ document.addEventListener('DOMContentLoaded', async () => {
     const resultEl = formEl.querySelector('.result-text');
     const buttonEl = formEl.querySelector('.exit-btn');
 
-    resultEl.innerHTML = "Ваш результат: " + get_result();
+    resultEl.innerHTML = "Ваш результат: " + await get_result();
 
     buttonEl.addEventListener('click', async (event) => {
         try {
             event.preventDefault();
             event.stopPropagation();
 
-            const response = await fetch("/logout");
-            const data = await response.json();
-
-            if (data.error) {
-                throw new Error("error" + data.error);
-            }
+            window.location.href = "/logout";
        } catch (e) {
             console.log(e);
        }
