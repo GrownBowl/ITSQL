@@ -146,3 +146,34 @@ body {
 .main .block:not(:last-child) {
     margin-bottom: 10px;
 }
+
+.check_table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #3a3a3a;
+    color: #fff;
+    font-family: inherit;
+    font-size: 1em;
+    margin: 0;
+}
+
+.check_table th, .check_table td {
+    border: 2px solid #bdbdbd;      /* Границы толще и светлее */
+    padding: 12px 18px;             /* Больше отступы */
+    text-align: left;
+    transition: background 0.2s;
+}
+
+.check_table th {
+    background: #444;
+    font-weight: normal;
+    color: #bdbdbd;
+}
+
+.check_table tr:nth-child(even) {
+    background: #393939;
+}
+
+.check_table tr:hover {
+    background: #222;
+}
