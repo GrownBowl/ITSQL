@@ -45,7 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `;
                 for (const values of data){
                     html += `<tr>`
-                    html += `<td>${values.ID}</td>`;
+                    html += `<td>${values}</td>`;
                     html += `</tr>`
                 }
                 html += `
