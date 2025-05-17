@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             event.stopPropagation();
 
             const sqlRequest = sqlRequestEl.value;
-
+            console.log(sqlRequest);
             if (sqlRequest === null) {
                 throw new error ('Поле для ввода пусто');
             }
@@ -32,19 +32,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             const data = await response.json();
-            const tableEl = formEl.querySelector('table');
+
+            const tableEl = formEl.querySelector('.output');
 
             if (data.error) {
                 throw new Error ('error' + data.error);
             } else {
-                const html = `<table border="1" class = check_table> 
+                let html = '';
+                console.log(data);
+                html += `<table border="1" class=check_table> 
                 <tbody>
                 `;
                 for (const values of data){
                     html += `<tr>`
-                    for (const value of values){
-                        html += `<td>${ value }</td>`
-                    }
+                    html += `<td>${values.ID}</td>`;
                     html += `</tr>`
                 }
                 html += `
@@ -100,15 +101,15 @@ document.addEventListener('DOMContentLoaded', async () => {
     const nextTaskEl = formEl.querySelector("#next_task");
     const previousTaskEl = formEl.querySelector("#previous_task");
 
-    nextTaskEl.addEventListener('click', (event) => {
+    nextTaskEl.addEventListener('click', async (event) => {
         event.preventDefault();
-        changeTask(1, tasks);
+        await changeTask(1, tasks);
     }); 
 
 
-    previousTaskEl.addEventListener('click', (event) => {
+    previousTaskEl.addEventListener('click', async (event) => {
         event.preventDefault();
-        changeTask(-1, tasks);
+        await changeTask(-1, tasks);
     }); 
 
 
@@ -118,34 +119,28 @@ document.addEventListener('DOMContentLoaded', async () => {
         return json;
     }
 
-    function showTask(tasks) {
-        const textTask = formEl.querySelector('text=["task"]');
-        let currTask = sessionStorage.getItem("currentTask");
+    async function showTask(tasks) {
+        const textTask = formEl.querySelector('.task');
+        let currTask = Number(sessionStorage.getItem("currentTask"));
         textTask.innerHTML = tasks[currTask].text;
-        console.log(tasks[currTask].text);
+
+        const numberTask = formEl.querySelector('.numTask');
+        numberTask.innerHTML = `Задание #${currTask+1}`;
     }
 
-    function changeTask(direction, tasks) {
-        const currTask = Number(sessionStorage.getItem("currentTask"));
+    async function changeTask(direction, tasks) {
+        let currTask = Number(sessionStorage.getItem("currentTask"));
         currTask += direction;
-
-        if (currTask < 0 || currTask > 4) {
-            return;
-        } else {
-            sessionStorage.setItem(currTask);
-            showTask(tasks);
-        }
-    }
-
-    /*
-    function toHTML (data) {
-        const fetchData = [];
-        if (data.hasOwnProperty('text')){
-            for(const json in data) {
-                fetchData.push(json);
+        try {
+            if (currTask < 0 || currTask > 4) {
+                return;
+            } else {
+                sessionStorage.removeItem("currentTask");
+                sessionStorage.setItem("currentTask", currTask);
+                showTask(tasks);
             }
+        } catch (e) {
+            console.log(e);
         }
-        if (data.hasOwnProperty(''))
     }
-    */
 });
