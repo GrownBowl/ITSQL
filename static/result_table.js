@@ -11,12 +11,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             event.preventDefault();
             event.stopPropagation();
 
-            const response = await fetch("/logout");
-            const data = await response.json();
-
-            if (data.error) {
-                throw new Error("error" + data.error);
-            }
+            window.location.href="/logout";
        } catch (e) {
             console.log(e);
        }
