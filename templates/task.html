@@ -3,19 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Задание #1</title>
-    <link rel="stylesheet" href="../static/task.css">
+    <link ref="stylesheet" href="../static/task.css">
 </head>
 <body>
     <div class="container">
         <div class="sidebar">
-            <h2>Задание #1</h2>
+            <h2 class="numTask">Задание #1</h2>
             <div class="task-arrows">
                 <a href="#" title="Предыдущее задание", id="previous_task">&#8592;</a>
                 <a href="#" title="Следующее задание", id="next_task">&#8594;</a>
             </div>
             <div>Текст задания</div>
             <text class="task">проверка</text>
-
         </div>
         <div class="main">
             <form action="#" class="sql">
@@ -24,7 +23,7 @@
                     <textarea name="sql" placeholder=""></textarea>
                     <div class="table"></div>
                     <div class="buttons">
-                        <button class="buttonTry">Выполнить</button>
+                        <button class="buttonTry" id="buttonTry">Выполнить</button>
                     </div>
                 </div>
             </form>
@@ -34,7 +33,7 @@
                     <label>Таблица вывода SQL</label>
                     <div class="output"></div>
                     <div class="buttons">
-                        <button class="buttonSend">Отправить</button>
+                        <button class="buttonSend" id="buttonSend">Отправить</button>
                     </div>
                 </div>
             </form>
