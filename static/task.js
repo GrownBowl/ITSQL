@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             const response = await fetch("/go_query", {
-                method: "POST",
+                method: "GET",
                 body: JSON.stringify({
                     request: sqlRequest,
                 }),
@@ -45,7 +45,9 @@ document.addEventListener('DOMContentLoaded', async () => {
                 `;
                 for (const values of data){
                     html += `<tr>`
-                    html += `<td>${values}</td>`;
+                    for (const value of values) {
+                        html += `<td>${value}</td>`;
+                    }
                     html += `</tr>`
                 }
                 html += `
