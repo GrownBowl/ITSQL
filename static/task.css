@@ -6,7 +6,6 @@ body {
     margin: 0;
     padding: 0;
 }
-
 .container {
     display: flex;
     gap: 20px;
@@ -14,7 +13,6 @@ body {
     height: 100vh;
     box-sizing: border-box;
 }
-
 .sidebar {
     background: #444;
     border-radius: 16px;
@@ -27,28 +25,24 @@ body {
     height: 100%;
     box-sizing: border-box;
 }
-
 .sidebar h2 {
     margin: 0 0 10px 0;
     font-size: 2.2em;
     font-weight: normal;
     letter-spacing: 1px;
 }
-
 .task-arrows {
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 10px;
 }
-
 .task-arrows a {
     font-size: 2.2em;
     color: #fff;
     text-decoration: none;
     transition: color 0.2s;
 }
-
 .task-arrows a:hover {
     color: #2ecc71;
 }
@@ -85,7 +79,6 @@ body {
     font-size: 1.1em;
     margin-bottom: 5px;
 }
-
 .block textarea, .block input {
     height: 100%;
     width: 100%;
@@ -99,22 +92,18 @@ body {
     resize: none;
     box-sizing: border-box;
 }
-
 .block textarea {
     min-height: 50px;
     max-width: 100%;
 }
-
 .block input {
     height: 38px;
     max-width: 100%;
 }
-
 .buttons {
     display: flex;
     justify-content: flex-end;
 }
-
 .buttonSend, .buttonTry {
     background: #2ecc71;
     color: #fff;
@@ -126,11 +115,9 @@ body {
     transition: background 0.2s;
     font-family: inherit;
 }
-
 .btn:hover {
     background: #27ae60;
 }
-
 .output {
     min-height: 25rem;
     height: 100%;
@@ -141,7 +128,6 @@ body {
     font-family: inherit;
     box-sizing: border-box;
 }
-
 /* Для плотного размещения блоков */
 .main .block:not(:last-child) {
     margin-bottom: 10px;
