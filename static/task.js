@@ -37,15 +37,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (data.error) {
                 throw new Error ('error' + data.error);
             } else {
-                const html = `<table class = check_table> 
+                const html = `<table border="1" class = check_table> 
                 <tbody>
                 `;
                 for (const values of data){
                     html += `<tr>`
                     for (const value of values){
-                        html += `
-                            <td>${ value }</td>
-                        `
+                        html += `<td>${ value }</td>`
                     }
                     html += `</tr>`
                 }
@@ -123,12 +121,12 @@ document.addEventListener('DOMContentLoaded', async () => {
     function showTask(tasks) {
         const textTask = formEl.querySelector('text=["task"]');
         let currTask = sessionStorage.getItem("currentTask");
-        textTask.innerHTML = tasks.text[currTask];
-        console.log(tasks.text[currTask]);
+        textTask.innerHTML = tasks[currTask].text;
+        console.log(tasks[currTask].text);
     }
 
     function changeTask(direction, tasks) {
-        const currTask = sessionStorage.getItem("currentTask");
+        const currTask = Number(sessionStorage.getItem("currentTask"));
         currTask += direction;
 
         if (currTask < 0 || currTask > 4) {
