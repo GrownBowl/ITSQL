@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
 
             const response = await fetch("/go_query", {
-                method: "GET",
+                method: "POST",
                 body: JSON.stringify({
                     request: sqlRequest,
                 }),
