@@ -14,7 +14,20 @@
                 <a href="#" title="Следующее задание", id="next_task">&#8594;</a>
             </div>
             <div>Текст задания</div>
-            <text class="task">проверка</text>
+            <text class="task">...</text>
+            <div class="buttons">
+                <button class="buttonEnd" id="buttonEnd">Завершить</button>
+            </div>
+            <div id="confirm-modal" class="modal">
+                <div class="modal-content">
+                    <div class="modal-header">Подтверждение</div>
+                    <div class="modal-body">Вы уверены?</div>
+                    <div class="modal-actions">
+                    <button id="button-yes" class="modal-btn confirm">Да</button>
+                    <button id="button-no" class="modal-btn cancel">Нет</button>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="main">
             <form action="#" class="sql">
