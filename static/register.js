@@ -39,11 +39,13 @@ document.addEventListener('DOMContentLoaded', async () => {
                 for (let i = 0; i < 4; i++) {
                     dataEl[i].value = "";
                 }
-                window.location.href = '/sign_in';
+                window.location.href = 'sign_in';
             }
 
+            /*
             console.log(userData);
-            setTimeout(() => {window.location.href = '/sign_in';}, 2000);
+            setTimeout(() => {window.location.href = 'sign_in';}, 2000);
+            */
         }
         catch (e) {
             console.log(e);
