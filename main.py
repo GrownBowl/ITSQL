@@ -4,7 +4,9 @@ import fdb
 from flask import Flask, request, jsonify, render_template, session, redirect
 from werkzeug.security import generate_password_hash, check_password_hash
 
-admins = [14]  # ID учетных записей администраторов
+AUTH_USERS_FILE = "auth_users.txt"
+
+admins = [19, 14]  # ID учетных записей администраторов
 
 auth_database = 'введите значение'
 auth_user = 'введите значение'
@@ -25,10 +27,67 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = "введите значение"
 
 
+def write_user_id_to_file(user_id: str):
+    with open(AUTH_USERS_FILE, "a") as f:
+        f.write(user_id + "\n")
+
+
+def remove_user_id_from_file(user_id: str):
+    with open(AUTH_USERS_FILE, "r") as f:
+        lines = f.readlines()
+
+    with open(AUTH_USERS_FILE, "w") as f:
+        for line in lines:
+            if line.strip() != user_id:
+                f.write(line)
+
+
+def user_is_authorized(user_id: str):
+    with open(AUTH_USERS_FILE, "r") as f:
+        lines = f.readlines()
+
+    with open(AUTH_USERS_FILE, "r") as f:
+        for line in lines:
+            if line.strip() == user_id:
+                return True
+
+        return False
+
+
+def sort_by_correct_answers(data):
+    scored_data = []
+    for item in data:
+        parts = item.split("правильных ответов:")
+
+        if len(parts) > 1:
+            score_str = parts[1].strip()
+            score = int(score_str)
+        else:
+            score = 0
+
+        scored_data.append((score, item))
+
+    scored_data.sort(key=lambda x: x[0], reverse=True)
+
+    sorted_data = [item[1] for item in scored_data]
+
+    return sorted_data
+
+
+def user_is_finished(user_id):
+    adm_cur = adm_stud_conn.cursor()
+    res = adm_cur.execute("select * from STUDENTISFINISHED where STUSENTID = ?", (user_id,)).fetchone()
+
+    return res is not None
+
+
 @app.route('/')
 def index():
     if not session.get('student_id'):
         return redirect('/sign_in')
+
+    if user_is_finished(session.get('student_id')):
+        return redirect('/result')
 
     return render_template('task.html')
 
@@ -87,7 +146,8 @@ def check_answer():
 
         print(answer_already)
         if answer_already:
-            adm_cur.execute("delete from STUDENTANSWERS where STUDENTID = ? and ANSWERNUMBER = ?", (session["student_id"], number))
+            adm_cur.execute("delete from STUDENTANSWERS where STUDENTID = ? and ANSWERNUMBER = ?",
+                            (session["student_id"], number))
 
         adm_cur.execute(
             "INSERT INTO STUDENTANSWERS (studentid, studentanswer, iscorrect, answerdatetime, ANSWERNUMBER) VALUES (?, ?, ?, ?, ?)",
@@ -154,10 +214,14 @@ def sign_in():
         password_from_form = req['password']
 
         cur = auth_conn.cursor()
-        hash_passwd = cur.execute("SELECT PASSWORD FROM users WHERE LASTNAME = ? AND FIRSTNAME = ? AND GROUPNAME = ?",
-                                  (surname_from_form, name_from_form, group_from_form)).fetchone()
         student_id = cur.execute("SELECT ID FROM users WHERE LASTNAME = ? AND FIRSTNAME = ? AND GROUPNAME = ?",
                                  (surname_from_form, name_from_form, group_from_form)).fetchone()
+
+        if user_is_authorized(str(student_id[0])):
+            return "Чейта мы делаем"
+
+        hash_passwd = cur.execute("SELECT PASSWORD FROM users WHERE LASTNAME = ? AND FIRSTNAME = ? AND GROUPNAME = ?",
+                                  (surname_from_form, name_from_form, group_from_form)).fetchone()
 
         if not hash_passwd:
             return jsonify({"error": "пользователь не найден"})
@@ -167,6 +231,8 @@ def sign_in():
             session['last_name'] = surname_from_form
             session['group'] = group_from_form
             session['student_id'] = int(student_id[0])
+
+            write_user_id_to_file(str(student_id[0]))
 
             return jsonify({})
 
@@ -184,7 +250,7 @@ def result():
 @app.route('/result_table', methods=['GET'])
 def result_table():
     if session['student_id'] in admins:
-        return render_template('result.html')
+        return render_template('result_table.html')
     return "Доступ ограничен"
 
 
@@ -211,6 +277,9 @@ def get_result_table():
     adm_cur = adm_stud_conn.cursor()
     result = adm_cur.execute("select STUDENTID, ISCORRECT, ANSWERNUMBER from STUDENTANSWERS").fetchall()
 
+    finished_students = adm_cur.execute("select * from STUDENTISFINISHED").fetchall()
+    print(19 in finished_students)
+
     auth_cur = auth_conn.cursor()
     all_users = auth_cur.execute("select ID, LASTNAME, FIRSTNAME, GROUPNAME from USERS").fetchall()
 
@@ -222,7 +291,12 @@ def get_result_table():
         firstname = user[2]
         groupname = user[3]
 
-        users_id[id] = f"{lastname} {firstname} {groupname}"
+        for el in finished_students:
+            if int(id) == el[0]:
+                users_id[id] = f"+ {lastname} {firstname} {groupname}"
+            else:
+                users_id[id] = f"- {lastname} {firstname} {groupname}"
+
         answers[id] = 0
 
     for res in result:
@@ -236,11 +310,23 @@ def get_result_table():
     for id, res in answers.items():
         results.append(f"{users_id[id]} правильных ответов: {res}")
 
+    results = sort_by_correct_answers(results)
+
     return results
 
 
+@app.route('/finish', methods=['GET', 'POST'])
+def finish():
+    adm_cur = adm_stud_conn.cursor()
+    adm_cur.execute("insert into STUDENTISFINISHED (stusentid, isfinished) VALUES (?, ?)",
+                    (session['student_id'], True))
+    adm_stud_conn.commit()
+
+    return jsonify({})
+
 @app.route('/logout')
 def logout():
+    remove_user_id_from_file(str(session["student_id"]))
     session.pop('first_name')
     session.pop('last_name')
     session.pop('group')
@@ -250,4 +336,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)

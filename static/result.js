@@ -20,6 +20,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function get_result() {
         const response = await fetch('/get_result');
         const data = await response.json();
-        return data;
+        return data.result;
     }
 });

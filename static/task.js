@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             event.stopPropagation();
             modalEl.style.display = 'flex';
 
-            const response = await fetch("/");
+            const response = await fetch("/finish");
             const data = await response.json();
 
             if (data.error) {
