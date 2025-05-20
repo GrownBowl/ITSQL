@@ -24,6 +24,7 @@ body {
     gap: 12px;
     height: 100%;
     box-sizing: border-box;
+    position: relative;
 }
 .sidebar h2 {
     margin: 0 0 10px 0;
@@ -115,7 +116,23 @@ body {
     transition: background 0.2s;
     font-family: inherit;
 }
-.btn:hover {
+.buttonEnd {
+    background: #2ecc71;
+    color: #fff;
+    border: none;
+    border-radius: 16px;
+    padding: 7px 22px;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-family: inherit;
+    position: absolute;
+    right: 12px;
+    bottom: 22px;
+}
+.buttonSend:hover, 
+.buttonEnd:hover, 
+.buttonTry:hover {
     background: #27ae60;
 }
 .output {
@@ -162,4 +179,78 @@ body {
 
 .check_table tr:hover {
     background: #222;
+}
+
+/* Ползунок в таблице */
+
+.table-scroll {
+    width: 100%;
+    overflow-x: auto;
+    /* Чтобы не было лишних отступов */
+    margin: 0;
+    padding: 0;
+}
+.table-scroll {
+    height: 100%; /* фиксированная высота */
+    overflow-y: auto;
+    /*border-radius: 0 0 12px 12px;*/
+}
+.table-scroll table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+/* Модальное окно */
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0; top: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(30, 30, 30, 0.7);
+    justify-content: center;
+    align-items: center;
+}
+.modal-content {
+    background: #232323;
+    color: #fff;
+    border-radius: 12px;
+    padding: 24px 24px 24px 24px;
+    min-width: 320px;
+    box-shadow: 0 6px 32px rgba(0,0,0,0.5);
+    text-align: center;
+}
+.modal-header {
+    font-size: 40px;
+    font-weight: bold;
+    margin-bottom: 18px;
+}
+.modal-actions {
+    margin-top: 20px;
+    display: flex;
+    gap: 16px;
+    justify-content: center;
+}
+.modal-btn {
+    padding: 8px 24px;
+    border-radius: 8px;
+    border: none;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+.modal-btn.confirm {
+    background: #40e28a;
+    color: #fff;
+}
+.modal-btn.confirm:hover {
+    background: #2dbd6e;
+}
+.modal-btn.cancel {
+    background: #363636;
+    color: #fff;
+}
+.modal-btn.cancel:hover {
+    background: #232323;
 }

@@ -3,10 +3,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     const buttonTryEl = formEl.querySelector('#buttonTry');
     const buttonSendEl = formEl.querySelector('#buttonSend');
+    const buttonEndEl = formEl.querySelector('#buttonEnd');
     const sqlRequestEl = formEl.querySelector('textarea[name="sql"]')
 
-    sessionStorage.setItem("currentTask", 0);
-
+    sessionStorage.setItem("currentTask", 1);
     const tasks = await fetchTask();
     showTask(tasks);
 
@@ -40,7 +40,8 @@ document.addEventListener('DOMContentLoaded', async () => {
             } else {
                 let html = '';
                 console.log(data);
-                html += `<table border="1" class=check_table> 
+                html += `<div class="table-scroll">
+                <table border="1" class=check_table> 
                 <tbody>
                 `;
                 for (const values of data){
@@ -52,7 +53,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 html += `
                 </tbody>
-                </table>
+                </div>
                 `;
                 tableEl.innerHTML = html;
                 console.log(data);
@@ -93,11 +94,51 @@ document.addEventListener('DOMContentLoaded', async () => {
             if (data.error) {
                 throw new Error ('error' + data.error);
             } else {
-                sessionStorage.setItem("currentTask", currTask++);
+                sqlRequestEl.value = "";
+                changeTask(1, tasks);
             }
         } catch (e) {
             console.log(e);
         }
+    });
+
+    const buttonYesEl = document.querySelector("#button-yes");
+    const buttonNoEl = document.querySelector("#button-no");
+    const modalEl = document.querySelector("#confirm-modal");
+
+    buttonEndEl.addEventListener('click', async (event) => {
+        modalEl.style.display = 'flex';
+    });
+
+    buttonNoEl.addEventListener('click', async () => {
+        modalEl.style.display = 'none';
+    });
+
+    // 
+    buttonYesEl.addEventListener('click', async (event) => {
+        modalEl.style.display = 'none';
+        try {
+            event.preventDefault();
+            event.stopPropagation();
+            modalEl.style.display = 'flex';
+
+            const response = await fetch("/");
+            const data = await response.json();
+
+            if (data.error) {
+                throw new Error ('error' + data.error);
+            } else {
+                window.location.href = "result";
+            }
+
+        } catch (e) {
+            console.log(e);
+        }
+    });
+
+    // Закрытие по клику вне окна
+    window.addEventListener('click', async (event) => {
+        if (event.target === modalEl) modalEl.style.display = 'none';
     });
 
     const nextTaskEl = formEl.querySelector("#next_task");
@@ -124,17 +165,18 @@ document.addEventListener('DOMContentLoaded', async () => {
     async function showTask(tasks) {
         const textTask = formEl.querySelector('.task');
         let currTask = Number(sessionStorage.getItem("currentTask"));
-        textTask.innerHTML = tasks[currTask].text;
+        textTask.innerHTML = tasks[currTask-1].text;
 
         const numberTask = formEl.querySelector('.numTask');
-        numberTask.innerHTML = `Задание #${currTask+1}`;
+        numberTask.innerHTML = `Задание #${currTask}`;
     }
 
     async function changeTask(direction, tasks) {
-        let currTask = Number(sessionStorage.getItem("currentTask"));
-        currTask += direction;
         try {
-            if (currTask < 0 || currTask > 4) {
+            let currTask = Number(sessionStorage.getItem("currentTask"));
+            currTask += direction;
+            if (currTask < 0 || currTask > tasks.length) {
+                currTask -= direction;
                 return;
             } else {
                 sessionStorage.removeItem("currentTask");
