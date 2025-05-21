@@ -19,7 +19,7 @@ services:
       - nginx
     networks:
       main:
-        ipv4_address: 172.52.52.2
+        ipv4_address: 172.52.52.20
 
 
   nginx:
@@ -33,7 +33,7 @@ services:
       - .:/app
     networks:
       main:
-        ipv4_address: 172.52.52.3
+        ipv4_address: 172.52.52.30
 
 
 networks:
