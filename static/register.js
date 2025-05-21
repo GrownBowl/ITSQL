@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             errorEl.value = "";
 
             if (userData[2] != userData[3]) {
-                throw new Error ('Пароли не совпадают.');
+                throw new Error (JSON.stringify({'to_user':'Пароли не совпадают.'}));
             }
 
             const response = await fetch("/register", {
@@ -46,7 +46,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
         catch (e) {
-            errorEl.innerHTML = e.message;
+            let textError = JSON.parse(e.message);
+            if (textError.to_user) {
+                errorEl.innerHTML = textError.to_user;
+            } else {
+                console.log(textError);
+            }
             buttonEl.classList.remove("register-button");
             buttonEl.classList.add("shake");
             setTimeout(() => {

@@ -31,7 +31,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             const data = await response.json();
-            if (data.error) {
+            if (data.to_user) {
                 throw new Error (data.error);
             } else {
                 for (let i = 0; i < 3; i++) {
@@ -41,7 +41,12 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
         catch (e) {
-            errorEl.innerHTML = e.message;
+            let textError = JSON.parse(e.message);
+            if (textError.to_user){
+                errorEl.innerHTML = textError.to_user;
+            } else {
+                console.log(textError);
+            }
             buttonEl.classList.remove("auth-btn");
             buttonEl.classList.add("shake");
             setTimeout(() => {
@@ -49,8 +54,6 @@ document.addEventListener('DOMContentLoaded', async () => {
                 buttonEl.classList.add("auth-btn");
             }, 750);
             setTimeout(() => { errorEl.innerHTML = ""; }, 3000);
-            console.log(e);
-            console.log(e);
         }
     });
 });
