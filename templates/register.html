@@ -7,7 +7,7 @@
 </head>
 <body>
     <div class="container">
-        <form class="register-box">
+        <form class="register-box" action="#">
             <div class="input-row">
                 <input type="text" name="fio" class="register-input name-input" placeholder="Фамилия Имя" required>
                 <input type="text" name="group" class="register-input group-input" placeholder="Группа" required>
@@ -16,9 +16,10 @@
                 <input type="password" name="pswd" class="register-input password-input" placeholder="Пароль" required>
                 <input type="password" name="submit-pswd" class="register-input password-input" placeholder="Подтверждение пароля" required>
             </div>
-            <button type="submit" class="register-btn">Регистрация</button>
+            <div class="error"></div>
+            <button type="submit" class="register-button">Регистрация</button>
         </form>
-        <a href="/sign_in" class="register-link">Есть аккаунт? Вход</a>
+        <a href="sign_in.html" class="register-link">Есть аккаунт? Вход</a>
     </div>
     <script src="../static/register.js"></script>
 </body>
