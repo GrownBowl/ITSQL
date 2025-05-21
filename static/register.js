@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const formEl = document.querySelector('.container');
-    const userData = [];
     const dataEl = [];
 
     dataEl.push(formEl.querySelector('input[name="fio"]'));
@@ -8,13 +7,17 @@ document.addEventListener('DOMContentLoaded', async () => {
     dataEl.push(formEl.querySelector('input[name="pswd"]'));
     dataEl.push(formEl.querySelector('input[name="submit-pswd"]'));
 
+    const buttonEl = formEl.querySelector('.register-button');
+    const errorEl = formEl.querySelector(".error");
+
     formEl.addEventListener('submit', async (event) => {
         try {
+            const userData = [];
             event.preventDefault();
             for (let i = 0; i < 4; i++) {
                 userData.push(dataEl[i].value);
-                dataEl[i].value = "";
             }
+            errorEl.value = "";
 
             if (userData[2] != userData[3]) {
                 throw new Error ('Пароли не совпадают.');
@@ -41,13 +44,16 @@ document.addEventListener('DOMContentLoaded', async () => {
                 }
                 window.location.href = 'sign_in';
             }
-
-            /*
-            console.log(userData);
-            setTimeout(() => {window.location.href = 'sign_in';}, 2000);
-            */
         }
         catch (e) {
+            errorEl.innerHTML = e.message;
+            buttonEl.classList.remove("register-button");
+            buttonEl.classList.add("shake");
+            setTimeout(() => {
+                buttonEl.classList.remove("shake");
+                buttonEl.classList.add("register-button");
+            }, 750);
+            setTimeout(() => { errorEl.innerHTML = ""; }, 3000);
             console.log(e);
         }
     });

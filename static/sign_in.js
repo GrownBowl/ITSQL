@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
     const formEl = document.querySelector('.container');
-    const userData = [];
     const dataEl = [];
 
     dataEl.push(formEl.querySelector('input[name="fio"]'));
@@ -10,6 +9,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     formEl.addEventListener('submit', async (event) => {
         try {
             event.preventDefault();
+            const userData = [];
             for (let i = 0; i < 3; i++) {
                 userData.push(dataEl[i].value);
             }
@@ -29,15 +29,24 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const data = await response.json();
             if (data.error) {
-                throw new Error ('error' + data.error);
+                throw new Error (data.error);
             } else {
                 for (let i = 0; i < 3; i++) {
                     dataEl[i].value = "";
                 }
-                window.location.href = '/';
+                window.location.href = 'task';
             }
         }
         catch (e) {
+            errorEl.innerHTML = e.message;
+            buttonEl.classList.remove("auth-btn");
+            buttonEl.classList.add("shake");
+            setTimeout(() => {
+                buttonEl.classList.remove("shake");
+                buttonEl.classList.add("auth-btn");
+            }, 750);
+            setTimeout(() => { errorEl.innerHTML = ""; }, 3000);
+            console.log(e);
             console.log(e);
         }
     });

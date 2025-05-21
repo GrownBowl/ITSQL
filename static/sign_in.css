@@ -82,3 +82,28 @@ body {
     text-decoration: underline;
     opacity: 1;
 }
+.shake {
+    animation: shake 0.4s ease-out;
+    border: 2px solid red;
+    background: red;
+    color: #fff;
+    border: none;
+    border-radius: 24px;
+    padding: 14px 0;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s;
+    margin-top: 6px;
+}
+@keyframes shake {
+    0% { transform: translate(2px); }
+    25% { transform: translate(-2px); }
+    50% { transform: translate(2px); }
+    75% { transform: translate(-2px); }
+    100% { transform: translate(2px); }
+}
+.error {
+    color: #fff;
+    font-size: 18px;
+}
