@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 AUTH_USERS_FILE = "auth_users.txt"
 
-admins = [19, 14]  # ID учетных записей администраторов
+admins = [1]  # ID учетных записей администраторов
 
 auth_database = 'введите значение'
 auth_user = 'введите значение'
@@ -23,7 +23,7 @@ adm_stud_user = 'введите значение'
 adm_stud_password = 'введите значение'
 adm_stud_conn = fdb.connect(database=adm_stud_database, user=adm_stud_user, password=adm_stud_password, charset='UTF8')
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 app.config['SECRET_KEY'] = "введите значение"
 
 
@@ -76,7 +76,7 @@ def sort_by_correct_answers(data):
 
 def user_is_finished(user_id):
     adm_cur = adm_stud_conn.cursor()
-    res = adm_cur.execute("select * from STUDENTISFINISHED where STUSENTID = ?", (user_id,)).fetchone()
+    res = adm_cur.execute("select * from STUDENTISFINISHED where STUDENTID = ?", (user_id,)).fetchone()
 
     return res is not None
 
@@ -108,17 +108,17 @@ def go_query():
         sql_code = err.args[1]
 
         if sql_code == -206:
-            return "Ошибка: Неизвестный столбец"
+            return jsonify({"error": "Ошибка: Неизвестный столбец"})
 
         elif sql_code == -104:
-            return "Ошибка синтаксиса SQL."
+            return jsonify({"error": "Ошибка синтаксиса SQL."})
 
         elif sql_code == -204:
-            return "Ошибка: неизвестная таблица"
+            return jsonify({"error": "Ошибка: неизвестная таблица"})
 
         else:
             print(err)
-            return "Неизвестная ошибка"
+            return jsonify({"error": "Неизвестная ошибка"})
 
 
 @app.route('/check_answer', methods=['GET', 'POST'])
@@ -216,15 +216,18 @@ def sign_in():
         cur = auth_conn.cursor()
         student_id = cur.execute("SELECT ID FROM users WHERE LASTNAME = ? AND FIRSTNAME = ? AND GROUPNAME = ?",
                                  (surname_from_form, name_from_form, group_from_form)).fetchone()
+	
+        if student_id is None:
+            return jsonify({"to_user": "Пользователь не найден"})
 
         if user_is_authorized(str(student_id[0])):
-            return "Чейта мы делаем"
+            return jsonify({"to_user": "Пользователь уже авторизован"})
 
         hash_passwd = cur.execute("SELECT PASSWORD FROM users WHERE LASTNAME = ? AND FIRSTNAME = ? AND GROUPNAME = ?",
                                   (surname_from_form, name_from_form, group_from_form)).fetchone()
 
         if not hash_passwd:
-            return jsonify({"error": "пользователь не найден"})
+            return jsonify({"to_user": "Пользователь не найден"})
 
         if check_password_hash(hash_passwd[0], password_from_form):
             session['first_name'] = name_from_form
@@ -237,7 +240,7 @@ def sign_in():
             return jsonify({})
 
         else:
-            return jsonify({"error": "пароли не совпадают"})
+            return jsonify({"to_user": "пароли не совпадают"})
 
     return render_template('sign_in.html')
 
@@ -318,7 +321,7 @@ def get_result_table():
 @app.route('/finish', methods=['GET', 'POST'])
 def finish():
     adm_cur = adm_stud_conn.cursor()
-    adm_cur.execute("insert into STUDENTISFINISHED (stusentid, isfinished) VALUES (?, ?)",
+    adm_cur.execute("insert into STUDENTISFINISHED (studentid, isfinished) VALUES (?, ?)",
                     (session['student_id'], True))
     adm_stud_conn.commit()
 
@@ -336,4 +339,4 @@ def logout():
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    app.run(host='0.0.0.0', port=5000)
