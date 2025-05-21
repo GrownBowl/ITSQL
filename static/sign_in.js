@@ -6,6 +6,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     dataEl.push(formEl.querySelector('input[name="group"]'));
     dataEl.push(formEl.querySelector('input[name="pswd"]'));
 
+    const errorEl = formEl.querySelector(".error");
+    const buttonEl = formEl.querySelector('.auth-btn');
+
     formEl.addEventListener('submit', async (event) => {
         try {
             event.preventDefault();
@@ -34,7 +37,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 for (let i = 0; i < 3; i++) {
                     dataEl[i].value = "";
                 }
-                window.location.href = 'task';
+                window.location.href = '/';
             }
         }
         catch (e) {

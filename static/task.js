@@ -5,6 +5,8 @@ document.addEventListener('DOMContentLoaded', async () => {
     const buttonSendEl = formEl.querySelector('#buttonSend');
     const buttonEndEl = formEl.querySelector('#buttonEnd');
     const sqlRequestEl = formEl.querySelector('textarea[name="sql"]')
+    const tableEl = formEl.querySelector('.output');
+
 
     sessionStorage.setItem("currentTask", 1);
     const tasks = await fetchTask();
@@ -32,8 +34,6 @@ document.addEventListener('DOMContentLoaded', async () => {
             });
 
             const data = await response.json();
-
-            const tableEl = formEl.querySelector('.output');
 
             if (data.error) {
                 throw new Error ('error' + data.error);
@@ -95,6 +95,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 throw new Error ('error' + data.error);
             } else {
                 sqlRequestEl.value = "";
+		tableEl.innerHTML = "";
                 changeTask(1, tasks);
             }
         } catch (e) {
