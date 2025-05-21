@@ -19,6 +19,9 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const sqlRequest = sqlRequestEl.value;
             console.log(sqlRequest);
+            if (sqlRequest === null) {
+                throw new error ('Поле для ввода пусто');
+            }
 
             const response = await fetch("/go_query", {
                 method: "POST",
@@ -58,8 +61,10 @@ document.addEventListener('DOMContentLoaded', async () => {
 
         } catch (e) {
             console.log(e);
-        }
-        
+//	    let textError = JSON.parse(e.message);
+//console.log(textError);
+	    tableEl.innerHTML = e.message;
+       }
     });
 
     
@@ -89,7 +94,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await response.json();
 
             if (data.error) {
-                throw new Error (data.error);
+                throw new Error ('error' + data.error);
             } else {
                 sqlRequestEl.value = "";
 		tableEl.innerHTML = "";
@@ -124,7 +129,7 @@ document.addEventListener('DOMContentLoaded', async () => {
             const data = await response.json();
 
             if (data.error) {
-                throw new Error (data.error);
+                throw new Error ('error' + data.error);
             } else {
                 window.location.href = "result";
             }
