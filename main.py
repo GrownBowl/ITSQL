@@ -126,17 +126,18 @@ def check_answer():
     req = request.json
 
     sql_query = req['request']
-    number = int(req['number']) + 1
+    number = int(req['number'])
     print(f"Студент с id: {session['student_id']} ответил на вопрос номер: {number} таким запросом: {sql_query}")
 
     try:
         adm_cur = adm_stud_conn.cursor()
-        correct_answer = adm_cur.execute("SELECT CORRECTANSWER FROM TASKS WHERE TASKID = ?", (number,)).fetchone()[0]
+        correct_query = adm_cur.execute("SELECT CORRECTANSWER FROM TASKS WHERE TASKID = ?", (number,)).fetchone()[0]
+        correct_answer = adm_cur.execute(correct_query).fetchall()
 
         stud_cur = stud_conn.cursor()
-        stud_answer = stud_cur.execute(sql_query).fetchone()[0]
+        stud_answer = stud_cur.execute(sql_query).fetchall()
 
-        if str(correct_answer) == str(stud_answer):
+        if correct_answer == stud_answer:
             answer_is_correct = True
         else:
             answer_is_correct = False
@@ -144,14 +145,13 @@ def check_answer():
         answer_already = adm_cur.execute("select * from STUDENTANSWERS where STUDENTID = ? and ANSWERNUMBER = ?",
                                          (session["student_id"], number)).fetchall()
 
-        print(answer_already)
         if answer_already:
             adm_cur.execute("delete from STUDENTANSWERS where STUDENTID = ? and ANSWERNUMBER = ?",
                             (session["student_id"], number))
 
         adm_cur.execute(
             "INSERT INTO STUDENTANSWERS (studentid, studentanswer, iscorrect, answerdatetime, ANSWERNUMBER) VALUES (?, ?, ?, ?, ?)",
-            (session["student_id"], stud_answer, answer_is_correct, datetime.now(), number))
+            (session["student_id"], stud_answer[0], answer_is_correct, datetime.now(), number))
         adm_stud_conn.commit()
 
         return jsonify({})
