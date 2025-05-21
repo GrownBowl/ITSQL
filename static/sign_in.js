@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', async () => {
 
             const data = await response.json();
             if (data.to_user) {
-                throw new Error (data.error);
+                throw new Error(data.to_user);
             } else {
                 for (let i = 0; i < 3; i++) {
                     dataEl[i].value = "";
@@ -41,11 +41,10 @@ document.addEventListener('DOMContentLoaded', async () => {
             }
         }
         catch (e) {
-            let textError = JSON.parse(e.message);
-            if (textError.to_user){
-                errorEl.innerHTML = textError.to_user;
+            if (e.message){
+                errorEl.innerHTML = e.message;
             } else {
-                console.log(textError);
+                console.log(e);
             }
             buttonEl.classList.remove("auth-btn");
             buttonEl.classList.add("shake");
