@@ -8,23 +8,23 @@ AUTH_USERS_FILE = "auth_users.txt"
 
 admins = [1]  # ID учетных записей администраторов
 
-auth_database = 'введите значение'
-auth_user = 'введите значение'
-auth_password = 'введите значение'
+auth_database = '172.52.52.2/3050:/db/authorization.fdb'
+auth_user = 'SYSDBA'
+auth_password = 'masterkey'
 auth_conn = fdb.connect(database=auth_database, user=auth_user, password=auth_password, charset='UTF8')
 
-stud_database = 'введите значение'
-stud_user = 'введите значение'
-stud_password = 'введите значение'
+stud_database = '172.52.52.2/3050:/db/study_platform.fdb'
+stud_user = 'student'
+stud_password = 'student_password'
 stud_conn = fdb.connect(database=stud_database, user=stud_user, password=stud_password, charset='UTF8')
 
-adm_stud_database = 'введите значение'
-adm_stud_user = 'введите значение'
-adm_stud_password = 'введите значение'
+adm_stud_database = '172.52.52.2/3050:/db/study_platform.fdb'
+adm_stud_user = 'SYSDBA'
+adm_stud_password = 'masterkey'
 adm_stud_conn = fdb.connect(database=adm_stud_database, user=adm_stud_user, password=adm_stud_password, charset='UTF8')
 
 app = Flask(__name__, static_folder='static')
-app.config['SECRET_KEY'] = "введите значение"
+app.config['SECRET_KEY'] = "yandexliceumsecretkey"
 
 
 def write_user_id_to_file(user_id: str):
@@ -57,7 +57,7 @@ def user_is_authorized(user_id: str):
 def sort_by_correct_answers(data):
     scored_data = []
     for item in data:
-        parts = item.split("правильных ответов:")
+        parts = item.split(":")
 
         if len(parts) > 1:
             score_str = parts[1].strip()
@@ -116,6 +116,12 @@ def go_query():
         elif sql_code == -204:
             return jsonify({"error": "Ошибка: неизвестная таблица"})
 
+        elif sql_code == -551:
+            return jsonify({"error": " Куда это мы полезли? Об этом будет доложено системному Администратору!"})
+
+        elif sql_code == -607:
+            return jsonify({"error": "Я тебе дропну таблицу  >:/"})
+
         else:
             print(err)
             return jsonify({"error": "Неизвестная ошибка"})
@@ -160,14 +166,23 @@ def check_answer():
         sql_code = err.args[1]
 
         if sql_code == -206:
-            return "Ошибка: Неизвестный столбец"
+            return jsonify({"error": "Ошибка: Неизвестный столбец"})
 
         elif sql_code == -104:
-            return "Ошибка синтаксиса SQL."
+            return jsonify({"error": "Ошибка синтаксиса SQL."})
+
+        elif sql_code == -204:
+            return jsonify({"error": "Ошибка: неизвестная таблица"})
+
+        elif sql_code == -551:
+            return jsonify({"error": " Куда это мы полезли? Об этом будет доложено системному Администратору!"})
+
+        elif sql_code == -607:
+            return jsonify({"error": "Я тебе дропну таблицу  >:/"})
 
         else:
             print(err)
-            return "Неизвестная ошибка"
+            return jsonify({"error": "Неизвестная ошибка"})
 
 
 @app.route('/get_tasks', methods=['GET'])
@@ -192,6 +207,12 @@ def register():
         surname, name = req['userName'].split()
         group = req['group']
         user_password = req['password']
+        auth_cur = auth_conn.cursor()
+        res = auth_cur.execute("select * from USERS where FIRSTNAME = ? and LASTNAME = ? and GROUPNAME = ?", (name, surname, group)).fetchone()
+
+        print(res)
+        if res:
+            return jsonify({"to_user": "Такой пользователь уже зарегестрирован"})
 
         hash_passwd = generate_password_hash(user_password)
 
@@ -281,11 +302,9 @@ def get_result_table():
     result = adm_cur.execute("select STUDENTID, ISCORRECT, ANSWERNUMBER from STUDENTANSWERS").fetchall()
 
     finished_students = adm_cur.execute("select * from STUDENTISFINISHED").fetchall()
-    print(19 in finished_students)
 
     auth_cur = auth_conn.cursor()
     all_users = auth_cur.execute("select ID, LASTNAME, FIRSTNAME, GROUPNAME from USERS").fetchall()
-
     answers = {}
     users_id = {}
     for user in all_users:
@@ -308,10 +327,10 @@ def get_result_table():
 
         if is_correct_answer:
             answers[id] += 1
-
+    print(users_id)
     results = []
     for id, res in answers.items():
-        results.append(f"{users_id[id]} правильных ответов: {res}")
+        results.append(f"{users_id[id]}: {res}")
 
     results = sort_by_correct_answers(results)
 
