@@ -57,11 +57,12 @@ body {
 }
 
 .sql{
-    height: 20%;
+    resize: none;
+    height: 50%;
 }
 
 .table{
-    height: 80%;
+    height: 100%;
 }
 
 .block {
@@ -81,6 +82,7 @@ body {
     margin-bottom: 5px;
 }
 .block textarea, .block input {
+    /* Убираем height: 100%, чтобы высота могла изменяться */
     height: 100%;
     width: 100%;
     background: #3a3a3a;
@@ -90,16 +92,26 @@ body {
     padding: 10px 12px;
     font-family: inherit;
     font-size: 1em;
-    resize: none;
+    resize: noen;
     box-sizing: border-box;
+    min-height: 50px;
+    max-height: 400px; /* ограничиваем максимальную высоту */
 }
 .block textarea {
     min-height: 50px;
     max-width: 100%;
 }
 .block input {
-    height: 38px;
+    resize: vertical;
+    max-height: 350px;
+    height: 60px;
     max-width: 100%;
+}
+.sql-input {
+    width: 100%;
+    box-sizing: border-box;
+    height: 100%;
+    resize: none;
 }
 .buttons {
     display: flex;
